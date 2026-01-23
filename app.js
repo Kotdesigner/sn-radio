@@ -1,13 +1,14 @@
 // ===================== CONFIG =====================
 // Stream host/port (from your provider)
-const STREAM_HOST = "uk3freenew.listen2myradio.com";
-const STREAM_PORT = "34451";
+//const STREAM_HOST = "uk3freenew.listen2myradio.com";
+//const STREAM_PORT = "34451";
 
 // We probe these URLs to detect whether the stream is actually delivering audio.
 const STREAM_URLS = [
-  `https://${STREAM_HOST}:${STREAM_PORT}/`,
-  `http://${STREAM_HOST}:${STREAM_PORT}/`,
-  `http://${STREAM_HOST}:${STREAM_PORT}/stream`,
+  "https://stevenomek.radiostream321.com/",
+  "http://stevenomek.radiostream321.com/",
+];
+
 ];
 
 // Mixcloud profile (fallback) + random sets list.
