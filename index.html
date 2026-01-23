@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>STEVE NOMEK • RADIO</title>
-  <meta name="description" content="Webradio wenn Stream Audio liefert — sonst Mixcloud Random Sets." />
+  <meta name="description" content="Webradio + Mixcloud. Stream-Status als Stempel (Offline / Now LIVE)." />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -30,69 +30,42 @@
     </header>
 
     <section class="grid">
-      <!-- RADIO -->
       <div id="radioCard" class="card radio">
         <div class="cardTop">
-          <div class="left">
-            <span class="tag">WEBRADIO</span>
-            <span id="liveBadge" class="badge" hidden>NOW LIVE</span>
-          </div>
+          <div class="left"><span class="tag">WEBRADIO</span></div>
           <div id="radioState" class="state">—</div>
         </div>
 
+        <div id="radioStamp" class="stamp offline" aria-live="polite">OFFLINE</div>
+
         <audio id="radio" controls preload="none" crossorigin="anonymous"></audio>
 
-        <div id="radioOverlay" class="overlay" hidden>
-          <div class="overlayInner">
-            <div class="overlayTitle">OFFLINE</div>
-            <div class="overlaySub">Kein Audio vom Stream — Mixcloud übernimmt.</div>
-          </div>
-        </div>
-
         <div class="actions">
-          <button id="smartPlay" class="btn primary">
-            <span class="ico" aria-hidden="true">▶</span>
-            <span id="playLabel">PLAY</span>
-          </button>
-          <button id="stopBtn" class="btn ghost" disabled>
-            <span class="ico" aria-hidden="true">■</span>
-            STOP
-          </button>
+          <button id="playRadio" class="btn primary"><span class="ico" aria-hidden="true">▶</span>PLAY RADIO</button>
+          <button id="stopRadio" class="btn ghost" disabled><span class="ico" aria-hidden="true">■</span>STOP</button>
         </div>
 
         <div class="mini">
-          <span id="lastCheck">—</span><span class="sep">•</span><span id="mode">Mode: auto</span>
+          <span id="lastCheck">—</span><span class="sep">•</span><span id="mode">Mode: dual</span>
         </div>
       </div>
 
-      <!-- MIXCLOUD -->
       <div id="mixCard" class="card mix">
         <div class="cardTop">
           <div class="left">
             <span class="tag alt">MIXCLOUD</span>
             <span id="mixTitle" class="mixTitle">Random Set</span>
           </div>
-          <div class="state">Fallback</div>
+          <div class="state">Always on</div>
         </div>
 
         <div class="mixWrap">
-          <iframe
-            id="mixFrame"
-            title="Mixcloud Player"
-            width="100%"
-            height="180"
-            frameborder="0"
-            allow="autoplay"
-            loading="lazy"
-            src="">
-          </iframe>
+          <iframe id="mixFrame" title="Mixcloud Player" width="100%" height="180" frameborder="0"
+            allow="autoplay" loading="lazy" src=""></iframe>
         </div>
 
         <div class="actions">
-          <button id="nextMix" class="btn ghost" disabled>
-            <span class="ico" aria-hidden="true">⟳</span>
-            RANDOM SET
-          </button>
+          <button id="nextMix" class="btn ghost"><span class="ico" aria-hidden="true">⟳</span>RANDOM SET</button>
         </div>
 
         <div class="footnote">

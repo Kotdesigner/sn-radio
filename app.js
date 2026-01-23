@@ -1,59 +1,43 @@
 // ===================== CONFIG =====================
-// Stream host/port (from your provider)
-//const STREAM_HOST = "uk3freenew.listen2myradio.com";
-//const STREAM_PORT = "34451";
-
-// We probe these URLs to detect whether the stream is actually delivering audio.
 const STREAM_URLS = [
   "https://stevenomek.radiostream321.com/",
   "http://stevenomek.radiostream321.com/",
+  "https://stevenomek.radio12345.com/",
+  "http://stevenomek.radio12345.com/",
+  "https://stevenomek.radiostream123.com/",
+  "http://stevenomek.radiostream123.com/",
 ];
 
-];
-
-// Mixcloud profile (fallback) + random sets list.
-// For TRUE random sets from *your* uploads, paste your mix URLs into MIXCLOUD_MIXES.
-// Example:
-//   "https://www.mixcloud.com/Steve_Nomek/your-set-name/"
 const MIXCLOUD_PROFILE = "Steve_Nomek";
 const MIXCLOUD_MIXES = [
-  // TODO: Paste your Mix URLs here for real random playback:
-  // "https://www.mixcloud.com/Steve_Nomek/xxxx/",
+  // "https://www.mixcloud.com/Steve_Nomek/dein-set-1/",
+  // "https://www.mixcloud.com/Steve_Nomek/dein-set-2/",
 ];
 
 const CHECK_EVERY_MS = 20000;
-const PROBE_TIMEOUT_MS = 4500;
+const PROBE_TIMEOUT_MS = 6500;
 
-// ===================== ELEMENTS =====================
 const el = {
   pill: document.getElementById("statusPill"),
   statusText: document.getElementById("statusText"),
   statusMeta: document.getElementById("statusMeta"),
-  headline: document.getElementById("headline"),
-  hint: document.getElementById("hint"),
   lastCheck: document.getElementById("lastCheck"),
   mode: document.getElementById("mode"),
 
-  smartPlay: document.getElementById("smartPlay"),
-  playLabel: document.getElementById("playLabel"),
-  stopBtn: document.getElementById("stopBtn"),
+  playRadio: document.getElementById("playRadio"),
+  stopRadio: document.getElementById("stopRadio"),
   nextMix: document.getElementById("nextMix"),
 
-  radioCard: document.getElementById("radioCard"),
-  liveBadge: document.getElementById("liveBadge"),
   radio: document.getElementById("radio"),
   radioState: document.getElementById("radioState"),
-  radioOverlay: document.getElementById("radioOverlay"),
+  radioStamp: document.getElementById("radioStamp"),
 
   mixFrame: document.getElementById("mixFrame"),
   mixTitle: document.getElementById("mixTitle"),
 };
 
-// ===================== STATE =====================
 let isLive = false;
 let lastGoodStreamUrl = null;
-let userStarted = false;
-let currentMode = "auto";
 
 function nowTime() {
   const d = new Date();
@@ -65,32 +49,32 @@ function setPill(state, text) {
   el.pill.classList.add(state);
   el.statusText.textContent = text;
 }
-function setMeta(text){ el.statusMeta.textContent = text || ""; }
-function setModeLabel(text){ el.mode.textContent = `Mode: ${text}`; }
 
-function setRadioEnabled(enabled){
-  el.radioOverlay.hidden = enabled;
-  el.radio.disabled = !enabled;
-
-  el.radioCard.classList.toggle("live", enabled);
-  el.radioCard.classList.toggle("offline", !enabled);
-  el.liveBadge.hidden = !enabled;
+function setMeta(text) {
+  el.statusMeta.textContent = text || "";
 }
 
-function stopRadio(){
+function setStampLive() {
+  el.radioStamp.textContent = "NOW LIVE";
+  el.radioStamp.classList.remove("offline");
+  el.radioStamp.classList.add("live");
+}
+
+function setStampOffline() {
+  el.radioStamp.textContent = "OFFLINE";
+  el.radioStamp.classList.remove("live");
+  el.radioStamp.classList.add("offline");
+}
+
+function stopRadio() {
   try { el.radio.pause(); } catch {}
 }
-function stopEverything(){
-  stopRadio();
-  el.stopBtn.disabled = true;
-}
 
-// ===================== MIXCLOUD =====================
-function mixcloudWidgetSrcFromFeed(feedUrlOrProfile){
+function mixcloudWidgetSrcFromFeed(feedUrlOrProfile) {
   let feedPath;
   if (feedUrlOrProfile.startsWith("http")) {
     const u = new URL(feedUrlOrProfile);
-    feedPath = u.pathname; // e.g. /Steve_Nomek/my-set/
+    feedPath = u.pathname;
   } else {
     feedPath = `/${feedUrlOrProfile}/`;
   }
@@ -98,7 +82,7 @@ function mixcloudWidgetSrcFromFeed(feedUrlOrProfile){
   return `https://www.mixcloud.com/widget/iframe/?feed=${enc}&hide_cover=1&mini=1&light=0&autoplay=1`;
 }
 
-function pickRandomMix(){
+function pickRandomMix() {
   if (Array.isArray(MIXCLOUD_MIXES) && MIXCLOUD_MIXES.length > 0) {
     const idx = Math.floor(Math.random() * MIXCLOUD_MIXES.length);
     return { type: "mix", value: MIXCLOUD_MIXES[idx] };
@@ -106,16 +90,13 @@ function pickRandomMix(){
   return { type: "profile", value: MIXCLOUD_PROFILE };
 }
 
-function loadRandomMix(){
+function loadRandomMix() {
   const pick = pickRandomMix();
   el.mixFrame.src = mixcloudWidgetSrcFromFeed(pick.value);
   el.mixTitle.textContent = pick.type === "mix" ? "Random Set" : "Profile (Fallback)";
 }
 
-// ===================== STREAM AUDIO PROBE =====================
-// Detect "online" by testing if an <audio> element becomes playable from the stream URL.
-// This avoids CORS/JSON and matches your requirement: check whether audio is sent.
-function probeOneUrl(url){
+function probeOneUrl(url) {
   return new Promise((resolve) => {
     const a = new Audio();
     a.preload = "auto";
@@ -137,7 +118,7 @@ function probeOneUrl(url){
     const onError = () => finish(false, "error");
     const onStalled = () => finish(false, "stalled");
 
-    function cleanup(){
+    function cleanup() {
       clearTimeout(timer);
       a.removeEventListener("canplay", onCanPlay);
       a.removeEventListener("loadedmetadata", onLoadedMeta);
@@ -146,16 +127,16 @@ function probeOneUrl(url){
       try { a.src = ""; } catch {}
     }
 
-    a.addEventListener("canplay", onCanPlay, { once:true });
-    a.addEventListener("loadedmetadata", onLoadedMeta, { once:true });
-    a.addEventListener("error", onError, { once:true });
-    a.addEventListener("stalled", onStalled, { once:true });
+    a.addEventListener("canplay", onCanPlay, { once: true });
+    a.addEventListener("loadedmetadata", onLoadedMeta, { once: true });
+    a.addEventListener("error", onError, { once: true });
+    a.addEventListener("stalled", onStalled, { once: true });
 
     try { a.load(); } catch {}
   });
 }
 
-async function probeStream(){
+async function probeStream() {
   const urls = lastGoodStreamUrl
     ? [lastGoodStreamUrl, ...STREAM_URLS.filter(u => u !== lastGoodStreamUrl)]
     : STREAM_URLS.slice();
@@ -164,48 +145,37 @@ async function probeStream(){
     const res = await probeOneUrl(url);
     if (res.ok) return res;
   }
-  return { ok:false, url:null, reason:"all_failed" };
+  return { ok: false, url: null, reason: "all_failed" };
 }
 
-function setRadioSource(url){
+function setRadioSource(url) {
   if (!url) return;
   el.radio.src = url;
   try { el.radio.load(); } catch {}
 }
 
-// ===================== APPLY STATE =====================
-function applyLiveState(live){
+function applyLiveState(live) {
   isLive = live;
 
   if (live) {
     setPill("online", "LIVE • AUDIO OK");
-    setMeta("Webradio aktiv");
-    el.headline.textContent = "Du bist live.";
-    el.hint.textContent = "Webradio ist aktiv. Wenn der Stream stoppt, schaltet es auf Mixcloud Random Set.";
-    el.playLabel.textContent = "PLAY LIVE";
-    setRadioEnabled(true);
-    el.nextMix.disabled = true;
+    setMeta(lastGoodStreamUrl ? `Quelle: ${lastGoodStreamUrl}` : "Webradio verfügbar");
+    setStampLive();
   } else {
     setPill("offline", "OFFLINE • NO AUDIO");
-    setMeta("Mixcloud übernimmt");
-    el.headline.textContent = "Offline Mode.";
-    el.hint.textContent = "Kein Audio vom Stream. Mixcloud Random Set übernimmt.";
-    el.playLabel.textContent = "PLAY MIX";
-    setRadioEnabled(false);
-    el.nextMix.disabled = false;
-    if (!el.mixFrame.src) loadRandomMix();
+    setMeta("Stream liefert kein Audio (du kannst trotzdem klicken)");
+    setStampOffline();
   }
 
   el.lastCheck.textContent = `Letzter Check: ${nowTime()}`;
+  el.mode.textContent = "Mode: dual";
 }
 
-// ===================== LOOP =====================
-async function refresh(){
+async function refresh() {
   setPill("loading", "Prüfe Stream-Audio…");
   setMeta("");
 
   const res = await probeStream();
-
   if (res.ok) {
     lastGoodStreamUrl = res.url;
     setRadioSource(lastGoodStreamUrl);
@@ -215,51 +185,37 @@ async function refresh(){
   }
 }
 
-// ===================== USER ACTIONS =====================
-el.smartPlay.addEventListener("click", async () => {
-  userStarted = true;
-
-  if (isLive) {
-    currentMode = "radio";
-    setModeLabel("radio");
-    el.radioState.textContent = "Verbinde…";
-    try {
-      await el.radio.play();
-      el.radioState.textContent = "Spielt.";
-      el.stopBtn.disabled = false;
-    } catch {
-      el.radioState.textContent = "Start blockiert (Browser).";
-      currentMode = "mixcloud";
-      setModeLabel("mixcloud (fallback)");
-      loadRandomMix();
-    }
-  } else {
-    currentMode = "mixcloud";
-    setModeLabel("mixcloud");
-    loadRandomMix();
-    el.stopBtn.disabled = false;
+el.playRadio.addEventListener("click", async () => {
+  el.radioState.textContent = "Verbinde…";
+  try {
+    if (!lastGoodStreamUrl) await refresh();
+    await el.radio.play();
+    el.radioState.textContent = "Spielt.";
+    el.stopRadio.disabled = false;
+  } catch (e) {
+    console.log("[PLAY RADIO] blocked/error:", e);
+    el.radioState.textContent = "Start blockiert / Stream nicht erreichbar.";
   }
 });
 
-el.stopBtn.addEventListener("click", () => {
-  stopEverything();
-});
-
-el.nextMix.addEventListener("click", () => {
-  loadRandomMix();
-  currentMode = "mixcloud";
-  setModeLabel("mixcloud • random");
+el.stopRadio.addEventListener("click", () => {
+  stopRadio();
+  el.stopRadio.disabled = true;
 });
 
 el.radio.addEventListener("playing", () => {
-  el.stopBtn.disabled = false;
+  el.stopRadio.disabled = false;
   el.radioState.textContent = "Spielt.";
 });
+
 el.radio.addEventListener("pause", () => {
   el.radioState.textContent = "Pausiert.";
 });
 
-// ===================== INIT =====================
+el.nextMix.addEventListener("click", () => {
+  loadRandomMix();
+});
+
 document.getElementById("year").textContent = new Date().getFullYear();
 loadRandomMix();
 refresh();
