@@ -1,29 +1,27 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>STEVE NOMEK • RADIO</title>
-  <meta name="description" content="Webradio + Mixcloud. Stream-Status als Stempel (Offline / Now LIVE)." />
+  <meta name="description" content="Steve Nomek Webradio & Mixcloud Sets" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="bg" aria-hidden="true"></div>
-
-  <main class="wrap">
+  <div class="bg"></div>
+  <div class="wrap">
     <header class="header">
       <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
+        <div class="logo"></div>
         <div>
           <h1 class="title">STEVE NOMEK RADIO</h1>
-          <div class="sub">TECHNO • LIVE</div>
+          <div class="sub">Techno & House Webradio</div>
         </div>
       </div>
-
       <div class="status">
-        <div id="statusPill" class="pill loading" role="status" aria-live="polite">
-          <span class="dot" aria-hidden="true"></span>
-          <span id="statusText">Prüfe Stream-Audio…</span>
+        <div id="statusPill" class="pill loading">
+          <div class="dot"></div>
+          <span id="statusText">Initialisierung...</span>
         </div>
         <div id="statusMeta" class="meta"></div>
       </div>
@@ -35,14 +33,13 @@
           <div class="left"><span class="tag">WEBRADIO</span></div>
           <div id="radioState" class="state">—</div>
         </div>
-
-        <div id="radioStamp" class="stamp offline" aria-live="polite">OFFLINE</div>
-
-        <audio id="radio" controls preload="none" crossorigin="anonymous"></audio>
+        
+        <div id="radioStamp" class="stamp offline">OFFLINE</div>
+        <audio id="radio" preload="none" crossorigin="anonymous"></audio>
 
         <div class="actions">
-          <button id="playRadio" class="btn primary"><span class="ico" aria-hidden="true">▶</span>PLAY RADIO</button>
-          <button id="stopRadio" class="btn ghost" disabled><span class="ico" aria-hidden="true">■</span>STOP</button>
+          <button id="playRadio" class="btn primary">▶ PLAY RADIO</button>
+          <button id="stopRadio" class="btn ghost" disabled>■ STOP</button>
         </div>
 
         <div class="mini">
@@ -58,29 +55,19 @@
           </div>
           <div class="state">Always on</div>
         </div>
-
         <div class="mixWrap">
-          <iframe id="mixFrame" title="Mixcloud Player" width="100%" height="180" frameborder="0"
-            allow="autoplay" loading="lazy" src=""></iframe>
+          <iframe id="mixFrame" frameborder="0" allow="autoplay" loading="lazy"></iframe>
         </div>
-
         <div class="actions">
-          <button id="nextMix" class="btn ghost"><span class="ico" aria-hidden="true">⟳</span>RANDOM SET</button>
-        </div>
-
-        <div class="footnote">
-          Hinweis: Mixcloud startet ggf. erst nach Klick im Player (Browser-Regel gegen Autoplay).
+          <button id="nextMix" class="btn ghost">⟳ RANDOM SET</button>
         </div>
       </div>
     </section>
 
     <footer class="footer">
-      <a class="link" href="https://www.mixcloud.com/Steve_Nomek/" target="_blank" rel="noreferrer">Mixcloud</a>
-      <span class="sep">•</span>
-      <span class="muted">© <span id="year"></span> Steve Nomek</span>
+      &copy; <span id="year"></span> Steve Nomek • <a href="#" class="link">Impressum</a>
     </footer>
-  </main>
-
+  </div>
   <script src="app.js"></script>
 </body>
 </html>
