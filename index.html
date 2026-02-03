@@ -20,9 +20,8 @@
       <div class="status">
         <div id="statusPill" class="pill loading">
           <div class="dot"></div>
-          <span id="statusText">Prüfe Stream...</span>
+          <span id="statusText">Prüfe Status...</span>
         </div>
-        <div id="statusMeta" class="meta"></div>
       </div>
     </header>
 
@@ -32,29 +31,28 @@
           <div class="left"><span class="tag">WEBRADIO</span></div>
           <div id="radioState" class="state">—</div>
         </div>
+        
         <div id="radioStamp" class="stamp offline">OFFLINE</div>
-        <audio id="radio" preload="none" crossorigin="anonymous"></audio>
+
         <div class="actions">
-          <button id="playRadio" class="btn primary">▶ PLAY RADIO</button>
-          <button id="stopRadio" class="btn ghost" disabled>■ STOP</button>
+          <button id="playRadio" class="btn primary">▶ PLAYER ÖFFNEN</button>
         </div>
+
         <div class="mini">
-          <span id="lastCheck">—</span><span class="sep">•</span><span id="mode">Mode: dual</span>
+          <span id="lastCheck">—</span>
         </div>
       </div>
 
       <div id="mixCard" class="card mix">
         <div class="cardTop">
-          <div class="left">
-            <span class="tag alt">MIXCLOUD</span>
-            <span id="mixTitle" class="mixTitle">Random Set</span>
-          </div>
+          <div class="left"><span class="tag alt">MIXCLOUD</span></div>
+          <div class="state">On Demand</div>
         </div>
         <div class="mixWrap">
-          <iframe id="mixFrame" frameborder="0" allow="autoplay"></iframe>
+          <iframe id="mixFrame" frameborder="0" allow="autoplay" loading="lazy"></iframe>
         </div>
         <div class="actions">
-          <button id="nextMix" class="btn ghost">⟳ RANDOM SET</button>
+          <button id="nextMix" class="btn ghost">⟳ ANDERE MIXES</button>
         </div>
       </div>
     </section>
