@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>STEVE NOMEK • RADIO</title>
-  <meta name="description" content="Steve Nomek Webradio & Mixcloud Sets" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -21,7 +20,7 @@
       <div class="status">
         <div id="statusPill" class="pill loading">
           <div class="dot"></div>
-          <span id="statusText">Initialisierung...</span>
+          <span id="statusText">Prüfe Stream...</span>
         </div>
         <div id="statusMeta" class="meta"></div>
       </div>
@@ -33,15 +32,12 @@
           <div class="left"><span class="tag">WEBRADIO</span></div>
           <div id="radioState" class="state">—</div>
         </div>
-        
         <div id="radioStamp" class="stamp offline">OFFLINE</div>
         <audio id="radio" preload="none" crossorigin="anonymous"></audio>
-
         <div class="actions">
           <button id="playRadio" class="btn primary">▶ PLAY RADIO</button>
           <button id="stopRadio" class="btn ghost" disabled>■ STOP</button>
         </div>
-
         <div class="mini">
           <span id="lastCheck">—</span><span class="sep">•</span><span id="mode">Mode: dual</span>
         </div>
@@ -53,10 +49,9 @@
             <span class="tag alt">MIXCLOUD</span>
             <span id="mixTitle" class="mixTitle">Random Set</span>
           </div>
-          <div class="state">Always on</div>
         </div>
         <div class="mixWrap">
-          <iframe id="mixFrame" frameborder="0" allow="autoplay" loading="lazy"></iframe>
+          <iframe id="mixFrame" frameborder="0" allow="autoplay"></iframe>
         </div>
         <div class="actions">
           <button id="nextMix" class="btn ghost">⟳ RANDOM SET</button>
@@ -65,7 +60,7 @@
     </section>
 
     <footer class="footer">
-      &copy; <span id="year"></span> Steve Nomek • <a href="#" class="link">Impressum</a>
+      &copy; <span id="year"></span> Steve Nomek
     </footer>
   </div>
   <script src="app.js"></script>
