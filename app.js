@@ -1,66 +1,71 @@
-const STREAM_URL = "https://uk3freenew.listen2myradio.com/live.mp3?typeportmount=s1_34451_stream_353288829";
+// ===================== CONFIG =====================
+// Deine Daten aus dem Screenshot
+const STREAM_CHECK_URL = "http://78.129.150.207:34451/index.html";
+const RADIO_PAGE_URL = "http://stevenomek.radiostream321.com"; // Dein offizieller Link
 
+const MIXCLOUD_PROFILE = "Steve_Nomek";
+const CHECK_EVERY_MS = 30000;
+
+// ===================== ELEMENTS =====================
 const el = {
   pill: document.getElementById("statusPill"),
   statusText: document.getElementById("statusText"),
-  statusMeta: document.getElementById("statusMeta"),
   lastCheck: document.getElementById("lastCheck"),
-  playRadio: document.getElementById("playRadio"),
-  stopRadio: document.getElementById("stopRadio"),
-  radio: document.getElementById("radio"),
   radioState: document.getElementById("radioState"),
   radioStamp: document.getElementById("radioStamp"),
-  mixFrame: document.getElementById("mixFrame"),
-  nextMix: document.getElementById("nextMix")
+  playRadio: document.getElementById("playRadio"), // Wir nutzen diesen Button als Link
+  mixFrame: document.getElementById("mixFrame")
 };
 
-async function checkStream() {
-  return new Promise((resolve) => {
-    const tester = new Audio();
-    tester.muted = true;
-    tester.src = STREAM_URL;
-    let timeout = setTimeout(() => { tester.src = ""; resolve(false); }, 7000);
-    tester.oncanplay = () => { clearTimeout(timeout); tester.src = ""; resolve(true); };
-    tester.onerror = () => { clearTimeout(timeout); resolve(false); };
-  });
-}
+// ===================== LOGIK =====================
 
-async function updateStatus() {
-  const isLive = await checkStream();
-  el.pill.className = `pill ${isLive ? 'online' : 'offline'}`;
-  el.statusText.textContent = isLive ? "LIVE • AUDIO OK" : "OFFLINE • NO AUDIO";
-  el.radioStamp.className = `stamp ${isLive ? 'live' : 'offline'}`;
-  el.radioStamp.textContent = isLive ? "NOW LIVE" : "OFFLINE";
-  el.lastCheck.textContent = `Check: ${new Date().toLocaleTimeString()}`;
-  return isLive;
-}
-
-el.playRadio.onclick = async () => {
-  el.radioState.textContent = "Verbinde...";
-  el.radio.src = STREAM_URL;
+// Prüft, ob der Shoutcast-Server antwortet
+async function checkStreamStatus() {
   try {
-    await el.radio.play();
-    el.radioState.textContent = "Spielt.";
-    el.stopRadio.disabled = false;
+    // Wir nutzen einen Proxy-Dienst, um die CORS-Sperre beim Check zu umgehen
+    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(STREAM_CHECK_URL)}`);
+    const data = await response.json();
+    // Wenn im HTML des Shoutcast-Panels "Stream is up" steht
+    return data.contents.includes("Stream is up");
   } catch (e) {
-    el.radioState.textContent = "Fehler beim Abspielen.";
+    return false;
   }
-};
+}
 
-el.stopRadio.onclick = () => {
-  el.radio.pause();
-  el.radio.src = "";
-  el.stopRadio.disabled = true;
-  el.radioState.textContent = "Gestoppt.";
+async function refresh() {
+  const isLive = await checkStreamStatus();
+  
+  if (isLive) {
+    el.pill.className = "pill online";
+    el.statusText.textContent = "LIVE • ON AIR";
+    el.radioStamp.className = "stamp live";
+    el.radioStamp.textContent = "NOW LIVE";
+    el.radioState.textContent = "Bereit zum Hören";
+    el.playRadio.textContent = "▶ ZUM RADIO-STREAM";
+  } else {
+    el.pill.className = "pill offline";
+    el.statusText.textContent = "OFFLINE • NO AUDIO";
+    el.radioStamp.className = "stamp offline";
+    el.radioStamp.textContent = "OFFLINE";
+    el.radioState.textContent = "Mixcloud aktiv";
+    el.playRadio.textContent = "RADIOPAGE (OFFLINE)";
+  }
+  
+  el.lastCheck.textContent = `Check: ${new Date().toLocaleTimeString()}`;
+}
+
+// Da der Browser den Stream blockiert, öffnen wir die offizielle Seite in einem neuen Tab
+el.playRadio.onclick = () => {
+  window.open(RADIO_PAGE_URL, '_blank');
 };
 
 // Mixcloud Initialisierung
 function loadMix() {
-  el.mixFrame.src = "https://www.mixcloud.com/widget/iframe/?feed=%2FSteve_Nomek%2F&hide_cover=1&mini=1&light=0";
+  el.mixFrame.src = `https://www.mixcloud.com/widget/iframe/?feed=%2F${MIXCLOUD_PROFILE}%2F&hide_cover=1&mini=1&light=0`;
 }
 
-el.nextMix.onclick = loadMix;
+// Start
 document.getElementById("year").textContent = new Date().getFullYear();
 loadMix();
-updateStatus();
-setInterval(updateStatus, 30000);
+refresh();
+setInterval(refresh, CHECK_EVERY_MS);
